@@ -1,0 +1,67 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model TrendAnalysis {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  keywords     String?
+  platform     String?
+  contentIdeas ContentIdea[]
+}
+
+model ContentIdea {
+  id              String         @id @default(cuid())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  title           String?
+  description     String?
+  trendAnalysis   TrendAnalysis? @relation(fields: [trendAnalysisId], references: [id])
+  trendAnalysisId String?
+  scripts         Script[]
+}
+
+model Hook {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  text      String?
+  scripts   Script[]
+}
+
+model Script {
+  id            String       @id @default(cuid())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  content       String?
+  contentIdea   ContentIdea? @relation(fields: [contentIdeaId], references: [id])
+  contentIdeaId String?
+  hook          Hook?        @relation(fields: [hookId], references: [id])
+  hookId        String?
+}
+
+model UserPreferences {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String?
+  preferences Json?
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  firstName String?
+  lastName  String?
+  username  String   @unique
+  email     String?  @unique
+  password  String
+  roles     Json
+}
